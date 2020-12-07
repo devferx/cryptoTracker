@@ -1,12 +1,7 @@
 import React, {Component} from 'react';
-import {
-  View,
-  FlatList,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
+import {View, FlatList, StyleSheet, ActivityIndicator} from 'react-native';
 import Http from 'cryptoTracker/src/libs/http';
+import Colors from 'cryptoTracker/src/res/colors';
 
 import CoinsItem from './CoinsItem';
 
@@ -38,11 +33,7 @@ class CoinsScreen extends Component {
     return (
       <View style={styles.container}>
         {loading ? (
-          <ActivityIndicator
-            style={styles.loader}
-            color="#000000"
-            size="large"
-          />
+          <ActivityIndicator style={styles.loader} color="#FFF" size="large" />
         ) : null}
         <FlatList
           data={coins}
@@ -56,7 +47,7 @@ class CoinsScreen extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF',
+    backgroundColor: Colors.charade,
   },
   title: {
     color: '#FFF',
