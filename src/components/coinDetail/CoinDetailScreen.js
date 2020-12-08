@@ -6,8 +6,10 @@ import {
   StyleSheet,
   FlatList,
   SectionList,
+  Pressable,
 } from 'react-native';
 import Http from 'cryptoTracker/src/libs/http';
+import Storage from 'cryptoTracker/src/libs/storage';
 import CoinMarketItem from './CoinMarketItem';
 import Colors from 'cryptoTracker/src/res/colors';
 
@@ -15,7 +17,28 @@ export default class CoinDetailScreen extends Component {
   state = {
     coin: {},
     markets: [],
+    isFavorite: false,
   };
+
+  toggleFavorite = () => {
+    if (this.state.isFavorite) {
+      this.removeFavorite();
+    } else {
+      this.addFavorite();
+    }
+  };
+
+  addFavorite = () => {
+    const coin = JSON.stringify(this.state.coin);
+    const key = `favorite-${this.state.coin.id}`;
+
+    const stored = Storage.instance.store(key, coin);
+
+    if (stored) {
+      this.setState({isFavorite: true});
+    }
+  };
+  removeFavorite = () => {};
 
   getSymbolIcon = (coinNameId) => {
     if (coinNameId) {
@@ -57,16 +80,29 @@ export default class CoinDetailScreen extends Component {
   };
 
   render() {
-    const {coin, markets} = this.state;
+    const {coin, markets, isFavorite} = this.state;
 
     return (
       <View style={styles.container}>
         <View style={styles.subHeader}>
-          <Image
-            style={styles.iconImage}
-            source={{uri: this.getSymbolIcon(coin.nameid)}}
-          />
-          <Text style={styles.titleText}>{coin.name}</Text>
+          <View style={styles.row}>
+            <Image
+              style={styles.iconImage}
+              source={{uri: this.getSymbolIcon(coin.nameid)}}
+            />
+            <Text style={styles.titleText}>{coin.name}</Text>
+          </View>
+
+          <Pressable
+            style={[
+              styles.btnFavorite,
+              isFavorite ? styles.btnFavoriteRemove : styles.btnFavoriteAdd,
+            ]}
+            onPress={this.toggleFavorite}>
+            <Text style={styles.btnFavoriteText}>
+              {isFavorite ? 'Remove favorite' : 'Add favorite'}
+            </Text>
+          </Pressable>
         </View>
 
         <SectionList
@@ -103,10 +139,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.charade,
   },
+  row: {
+    flexDirection: 'row',
+  },
   subHeader: {
     backgroundColor: 'rgba(0,0,0,0.1)',
     padding: 16,
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   titleText: {
     fontSize: 16,
@@ -144,8 +185,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   sectionText: {
-    color: '#fff',
+    color: Colors.white,
     fontSize: 14,
     fontWeight: 'bold',
+  },
+  btnFavoriteText: {
+    color: Colors.white,
+  },
+  btnFavorite: {
+    padding: 8,
+    borderRadius: 8,
+  },
+  btnFavoriteAdd: {
+    backgroundColor: Colors.picton,
+  },
+  btnFavoriteRemove: {
+    backgroundColor: Colors.carmine,
   },
 });
