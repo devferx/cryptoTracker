@@ -7,6 +7,7 @@ import {
   FlatList,
   SectionList,
   Pressable,
+  Alert,
 } from 'react-native';
 import Http from 'cryptoTracker/src/libs/http';
 import Storage from 'cryptoTracker/src/libs/storage';
@@ -28,17 +29,48 @@ export default class CoinDetailScreen extends Component {
     }
   };
 
-  addFavorite = () => {
+  addFavorite = async () => {
     const coin = JSON.stringify(this.state.coin);
     const key = `favorite-${this.state.coin.id}`;
 
-    const stored = Storage.instance.store(key, coin);
+    const stored = await Storage.instance.store(key, coin);
+    console.log('stored', stored);
 
     if (stored) {
       this.setState({isFavorite: true});
     }
   };
-  removeFavorite = () => {};
+
+  removeFavorite = () => {
+    Alert.alert('Remove Favorite', 'Are you sure', [
+      {text: 'Cancel', onPress: () => {}, style: 'cancel'},
+      {
+        text: 'Remove',
+        onPress: async () => {
+          const key = `favorite-${this.state.coin.id}`;
+
+          await Storage.instance.remove(key);
+
+          this.setState({isFavorite: false});
+        },
+        style: 'destructive',
+      },
+    ]);
+  };
+
+  getFavorite = async () => {
+    try {
+      const key = `favorite-${this.state.coin.id}`;
+
+      const favStr = await Storage.instance.get(key);
+
+      if (favStr !== null) {
+        this.setState({isFavorite: true});
+      }
+    } catch (error) {
+      console.log('get favorites err', error);
+    }
+  };
 
   getSymbolIcon = (coinNameId) => {
     if (coinNameId) {
@@ -52,13 +84,13 @@ export default class CoinDetailScreen extends Component {
     this.setState({markets});
   };
 
-  setCoinFromParams = (coin) => this.setState({coin});
-
   componentDidMount() {
     const {coin} = this.props.route.params;
-    this.setCoinFromParams(coin);
     this.props.navigation.setOptions({title: coin.symbol});
     this.getMarkets(coin.id);
+    this.setState({coin}, () => {
+      this.getFavorite();
+    });
   }
 
   getSections = (coin) => {
