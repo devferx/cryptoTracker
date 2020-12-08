@@ -1,9 +1,20 @@
 import React, {Component} from 'react';
-import {Text, Image, View, StyleSheet, SectionList} from 'react-native';
+import {
+  Text,
+  Image,
+  View,
+  StyleSheet,
+  FlatList,
+  SectionList,
+} from 'react-native';
+import Http from 'cryptoTracker/src/libs/http';
+import CoinMarketItem from './CoinMarketItem';
 import Colors from 'cryptoTracker/src/res/colors';
+
 export default class CoinDetailScreen extends Component {
   state = {
     coin: {},
+    markets: [],
   };
 
   getSymbolIcon = (coinNameId) => {
@@ -12,9 +23,16 @@ export default class CoinDetailScreen extends Component {
     }
   };
 
+  getMarkets = async (coinId) => {
+    const url = `https://api.coinlore.net/api/coin/markets/?id=${coinId}`;
+    const markets = await Http.instance.get(url);
+    this.setState({markets});
+  };
+
   componentDidMount() {
     const {coin} = this.props.route.params;
     this.props.navigation.setOptions({title: coin.symbol});
+    this.getMarkets(coin.id);
     this.setState({coin});
   }
 
@@ -37,7 +55,8 @@ export default class CoinDetailScreen extends Component {
   };
 
   render() {
-    const {coin} = this.state;
+    const {coin, markets} = this.state;
+
     return (
       <View style={styles.container}>
         <View style={styles.subHeader}>
@@ -49,6 +68,7 @@ export default class CoinDetailScreen extends Component {
         </View>
 
         <SectionList
+          style={styles.section}
           sections={this.getSections(coin)}
           keyExtractor={(item) => item}
           renderItem={({item}) => (
@@ -61,6 +81,15 @@ export default class CoinDetailScreen extends Component {
               <Text style={styles.sectionText}>{section.title}</Text>
             </View>
           )}
+        />
+
+        <Text style={styles.marketTitle}>Markets</Text>
+        <FlatList
+          style={styles.list}
+          horizontal
+          data={markets}
+          keyExtractor={(item) => `${item.base}-${item.name}-${item.quote}`}
+          renderItem={({item}) => <CoinMarketItem item={item} />}
         />
       </View>
     );
@@ -86,6 +115,20 @@ const styles = StyleSheet.create({
   iconImage: {
     width: 25,
     height: 25,
+  },
+  list: {
+    maxHeight: 100,
+    paddingLeft: 16,
+  },
+  marketTitle: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    marginLeft: 16,
+  },
+  section: {
+    maxHeight: 220,
   },
   sectionHeader: {
     backgroundColor: 'rgba(0,0,0,0.2)',

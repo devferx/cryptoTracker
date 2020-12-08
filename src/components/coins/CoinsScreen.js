@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {View, FlatList, StyleSheet, ActivityIndicator} from 'react-native';
 import Http from 'cryptoTracker/src/libs/http';
 import Colors from 'cryptoTracker/src/res/colors';
-
 import CoinsItem from './CoinsItem';
 
 class CoinsScreen extends Component {
