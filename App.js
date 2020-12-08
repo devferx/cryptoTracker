@@ -2,6 +2,7 @@ import React from 'react';
 import {Image} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import CoinsStack from 'cryptoTracker/src/components/coins/CoinsStack';
+import FavoritesStack from 'cryptoTracker/src/components/favorites/FavoritesStack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Colors from 'cryptoTracker/src/res/colors';
 
@@ -23,6 +24,18 @@ const App = () => {
               <Image
                 style={{tintColor: color, width: size, height: size}}
                 source={require('cryptoTracker/src/assets/bank.png')}
+              />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="Favorites"
+          component={FavoritesStack}
+          options={{
+            tabBarIcon: ({size, color}) => (
+              <Image
+                style={{tintColor: color, width: size, height: size}}
+                source={require('cryptoTracker/src/assets/star.png')}
               />
             ),
           }}
