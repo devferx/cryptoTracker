@@ -31,8 +31,6 @@ class CoinsScreen extends Component {
   };
 
   handlePress = (coin) => {
-    console.log('go to detail', this.props);
-
     this.props.navigation.navigate('CoinDetail', {coin});
   };
 
