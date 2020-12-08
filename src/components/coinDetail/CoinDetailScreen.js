@@ -29,11 +29,13 @@ export default class CoinDetailScreen extends Component {
     this.setState({markets});
   };
 
+  setCoinFromParams = (coin) => this.setState({coin});
+
   componentDidMount() {
     const {coin} = this.props.route.params;
+    this.setCoinFromParams(coin);
     this.props.navigation.setOptions({title: coin.symbol});
     this.getMarkets(coin.id);
-    this.setState({coin});
   }
 
   getSections = (coin) => {
